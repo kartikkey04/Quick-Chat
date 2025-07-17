@@ -1,13 +1,15 @@
 const router = require("express").Router();
 const User = require("../models/user");
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config({path: '../../config.env'});
 
-module.exports = router.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
     if (user) {
-      res.send({
+      return res.send({
         message: "User already exist",
         success: false,
       });
@@ -20,17 +22,58 @@ module.exports = router.post("/signup", async (req, res) => {
 
     await newUser.save();
 
-    res.send({
+    return res.send({
         message: 'User created successfully',
         success: true
     })
 
   } catch (error) {
-    res.send({
+    return res.send({
       message: error.message,
       success: false,
     });
   }
 });
+
+router.post("/login", async(req, res) => {
+
+  try{
+
+    const user = await User.findOne({email: req.body.email});
+
+    if(!user){
+      return res.send({
+        message: "User does not exist!!!",
+        success: false
+      })
+    }
+
+    const isValid = await bcrypt.compare(req.body.password, user.password);
+
+    if(!isValid){
+      return res.send({
+        message: "invalid user!!!",
+        success: false
+      })
+    }
+
+    const token = jwt.sign({userId: User._id}, process.env.JWT_SECRET, {expiresIn: '1d'});
+
+    return res.send({
+      message: "User logged in successfully",
+      success: true,
+      token: token
+    })
+
+  }catch(error){
+    return res.send({
+      message: error.message,
+      success: false
+    })
+  }
+
+})
+
+module.exports = router;
 
 
