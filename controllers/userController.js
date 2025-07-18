@@ -20,6 +20,32 @@ router.get("/get-logged-user", authMiddleware, async(req, res) => {
             success: false
         })
     }
+});
+
+router.get("/get-all-users", authMiddleware, async(req, res) => {
+    try{
+        const userId = req.userId;
+        const allUsers = await User.find({_id:{$ne:userId}});
+
+        const usersForClient = allUsers.map(user => ({
+            _id: user._id,
+            email: user.email,
+          }));
+
+        res.status(200).json({
+            message: "All user fetched successfully",
+            success: true,
+            data: usersForClient,
+        })
+
+    }catch(error){
+
+        res.status(500).json({
+            messsage: error.message,
+            success: false
+        })
+        
+    }
 })
 
 module.exports = router;
