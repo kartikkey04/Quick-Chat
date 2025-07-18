@@ -27,15 +27,10 @@ router.get("/get-all-users", authMiddleware, async(req, res) => {
         const userId = req.userId;
         const allUsers = await User.find({_id:{$ne:userId}});
 
-        const usersForClient = allUsers.map(user => ({
-            _id: user._id,
-            email: user.email,
-          }));
-
         res.status(200).json({
             message: "All user fetched successfully",
             success: true,
-            data: usersForClient,
+            data: allUsers,
         })
 
     }catch(error){

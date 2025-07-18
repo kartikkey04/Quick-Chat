@@ -18,8 +18,11 @@ const userSchema = mongoose.Schema({
 
     password:{
         type: String,
-        required: true
+        required: true,
+        select: false,
+        minlength: 8
     },
+
     profilePic:{
         type: String,
         required: false
