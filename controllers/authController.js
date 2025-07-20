@@ -63,6 +63,8 @@ router.post("/login", async(req, res) => {
     }
 
     // Check password
+    console.log("pass:",password);
+    console.log("pass:",user.password);
     const isValid = await bcrypt.compare(password, user.password);
     if(!isValid){
       return res.status(400).send({
